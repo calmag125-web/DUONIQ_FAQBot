@@ -106,9 +106,15 @@ async def reload_faqs(update: Update, context: ContextTypes.DEFAULT_TYPE) -> Non
     try:
         FAQS = load_faqs()
         await update.message.reply_text(f"✅ Reloaded {len(FAQS)} FAQ entries.")
-    except Exception as exc:
+    except Exception as exc:  # noqa: BLE001
         logger.exception("Failed to reload FAQs")
         await update.message.reply_text(f"❌ Failed to reload: {exc}")
+
+
+FALLBACK_ANSWER = (
+    "🤖 I don't have a specific answer for that yet. Type /faq to see topics "
+    "I can help with, or reach out to the DUONIQ team directly for anything else."
+)
 
 
 async def auto_reply(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
@@ -117,6 +123,8 @@ async def auto_reply(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None
     match = find_match(update.message.text)
     if match:
         await update.message.reply_text(f"💬 {match['answer']}")
+    else:
+        await update.message.reply_text(FALLBACK_ANSWER)
 
 
 def main() -> None:
